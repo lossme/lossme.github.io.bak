@@ -273,6 +273,140 @@
             
               
                 
+                <a class="post-title-link" href="/2018/01/03/NRC &#xxxx 编码解码/" itemprop="url">
+                  NCR 编码解码
+                </a>
+              
+            
+          </h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            <span class="post-meta-item-icon">
+              <i class="fa fa-calendar-o"></i>
+            </span>
+            <span class="post-meta-item-text">发表于</span>
+            <time itemprop="dateCreated" datetime="2018-01-03T14:34:21+08:00" content="2018-01-03">
+              2018-01-03
+            </time>
+          </span>
+
+          
+            <span class="post-category" >
+              &nbsp; | &nbsp;
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+              
+                <span itemprop="about" itemscope itemtype="https://schema.org/Thing">
+                  <a href="/categories/Python/" itemprop="url" rel="index">
+                    <span itemprop="name">Python</span>
+                  </a>
+                </span>
+
+                
+                
+
+              
+            </span>
+          
+
+          
+            
+              <span class="post-comments-count">
+                &nbsp; | &nbsp;
+                <a href="/2018/01/03/NRC &#xxxx 编码解码/#comments" itemprop="discussionUrl">
+                  <span class="post-comments-count ds-thread-count" data-thread-key="2018/01/03/NRC &#xxxx 编码解码/" itemprop="commentsCount"></span>
+                </a>
+              </span>
+            
+          
+
+          
+
+          
+          
+
+          
+        </div>
+      </header>
+    
+
+
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        
+          
+            <p>引自维基百科</p>
+<blockquote>
+<p>字符值引用 (numeric character reference, NCR)是在标记语言SGML以及派生的如HTML与XML中常见的一种转义序列结构，用来表示Unicode的通用字符集 (UCS)中的单个字符. NCR可以表示在一个特定文档中不能直接编码的字符，而该标记语言阅读器软件把每个NCR当作一个字符来处理。</p>
+</blockquote>
+<p>NCR（Numeric Character Reference）编码是由一个与号(&amp;)跟着一个井号(#), 然后跟着这个字符的Unicode编码值, 最后跟着一个分号组成的。</p>
+<h2 id="那怎么将-NCR-字符转换成文字"><a href="#那怎么将-NCR-字符转换成文字" class="headerlink" title="那怎么将 NCR 字符转换成文字"></a>那怎么将 NCR 字符转换成文字</h2><h3 id="方法一"><a href="#方法一" class="headerlink" title="方法一"></a>方法一</h3><p>利用 chr 和 ord 函数解码</p>
+<ul>
+<li><code>chr</code>返回值是当前整数对应的字符。参数可以是10进制也可以是16进制的形式。</li>
+<li><code>ord</code>参数是一个字符，返回值是对应的十进制整数</li>
+</ul>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div></pre></td><td class="code"><pre><div class="line"><span class="meta">&gt;&gt;&gt; </span>ord(<span class="string">"蛇"</span>)</div><div class="line"><span class="number">34503</span></div><div class="line"><span class="meta">&gt;&gt;&gt; </span>chr(<span class="number">34503</span>)</div><div class="line"><span class="string">'蛇'</span></div><div class="line"><span class="meta">&gt;&gt;&gt; </span>hex(<span class="number">34503</span>)</div><div class="line"><span class="string">'0x86c7'</span></div><div class="line"><span class="meta">&gt;&gt;&gt; </span>chr(<span class="number">0x86c7</span>)</div><div class="line"><span class="string">'蛇'</span></div></pre></td></tr></table></figure>
+<p>我们可以用这组函数来解码 NCR 转义的字符了</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">import</span> re</div><div class="line"></div><div class="line"><span class="function"><span class="keyword">def</span> <span class="title">ncr_unescape</span><span class="params">(s)</span>:</span></div><div class="line">    <span class="keyword">return</span> re.sub(<span class="string">"&amp;#(\d+)(;|(?=\s))"</span>, <span class="keyword">lambda</span> x: chr(int(x.group(<span class="number">1</span>))), s)</div><div class="line"></div><div class="line">html = <span class="string">r'商品标题：&amp;#22825;&amp;#28982;&amp;#27668;&amp;#34892;&amp;#19994;&amp;#27861;&amp;#24459;&amp;#23454;&amp;#21153;'</span></div><div class="line">print(ncr_unescape(html))</div><div class="line"><span class="comment"># 商品标题：天然气行业法律实务</span></div></pre></td></tr></table></figure>
+<h3 id="方法二"><a href="#方法二" class="headerlink" title="方法二"></a>方法二</h3><p>Python 有内置的标准库来解码，使用起来更为简便</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">from</span> html.parser <span class="keyword">import</span> HTMLParser</div><div class="line"></div><div class="line">html = <span class="string">r'商品标题：&amp;#22825;&amp;#28982;&amp;#27668;&amp;#34892;&amp;#19994;&amp;#27861;&amp;#24459;&amp;#23454;&amp;#21153;'</span></div><div class="line"></div><div class="line">html_parser = HTMLParser()</div><div class="line">print(html_parser.unescape(html))</div><div class="line"><span class="comment"># 商品标题：天然气行业法律实务</span></div></pre></td></tr></table></figure>
+
+          
+        
+      
+    </div>
+
+    <div>
+      
+    </div>
+
+    <div>
+      
+    </div>
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </article>
+
+
+    
+      
+
+  
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+            
+            
+              
+                
                 <a class="post-title-link" href="/2017/12/22/Ubuntu开启cron日志/" itemprop="url">
                   Ubuntu开启cron日志
                 </a>
@@ -564,8 +698,8 @@
               <span class="post-meta-item-text">分类于</span>
               
                 <span itemprop="about" itemscope itemtype="https://schema.org/Thing">
-                  <a href="/categories/编程/" itemprop="url" rel="index">
-                    <span itemprop="name">编程</span>
+                  <a href="/categories/Python/" itemprop="url" rel="index">
+                    <span itemprop="name">Python</span>
                   </a>
                 </span>
 
@@ -684,8 +818,8 @@
               <span class="post-meta-item-text">分类于</span>
               
                 <span itemprop="about" itemscope itemtype="https://schema.org/Thing">
-                  <a href="/categories/编程/" itemprop="url" rel="index">
-                    <span itemprop="name">编程</span>
+                  <a href="/categories/Python/" itemprop="url" rel="index">
+                    <span itemprop="name">Python</span>
                   </a>
                 </span>
 
@@ -804,8 +938,8 @@
               <span class="post-meta-item-text">分类于</span>
               
                 <span itemprop="about" itemscope itemtype="https://schema.org/Thing">
-                  <a href="/categories/段子/" itemprop="url" rel="index">
-                    <span itemprop="name">段子</span>
+                  <a href="/categories/joke/" itemprop="url" rel="index">
+                    <span itemprop="name">joke</span>
                   </a>
                 </span>
 
@@ -1039,7 +1173,7 @@
         <nav class="site-state motion-element">
           <div class="site-state-item site-state-posts">
             <a href="/archives">
-              <span class="site-state-item-count">6</span>
+              <span class="site-state-item-count">7</span>
               <span class="site-state-item-name">日志</span>
             </a>
           </div>
@@ -1056,7 +1190,7 @@
           
             <div class="site-state-item site-state-tags">
               <a href="/tags">
-                <span class="site-state-item-count">5</span>
+                <span class="site-state-item-count">4</span>
                 <span class="site-state-item-name">标签</span>
               </a>
             </div>
@@ -1122,7 +1256,7 @@
         <div class="copyright" >
   
   &copy; 
-  <span itemprop="copyrightYear">2017</span>
+  <span itemprop="copyrightYear">2018</span>
   <span class="with-love">
     <i class="fa fa-heart"></i>
   </span>
