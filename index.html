@@ -273,6 +273,112 @@
             
               
                 
+                <a class="post-title-link" href="/2018/01/11/Ubuntu 17.10 VMware Workstation 14 Pro问题/" itemprop="url">
+                  Ubuntu 17.10 VMware Workstation 14 Proq不能启动虚拟机的问题
+                </a>
+              
+            
+          </h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            <span class="post-meta-item-icon">
+              <i class="fa fa-calendar-o"></i>
+            </span>
+            <span class="post-meta-item-text">发表于</span>
+            <time itemprop="dateCreated" datetime="2018-01-11T10:07:57+08:00" content="2018-01-11">
+              2018-01-11
+            </time>
+          </span>
+
+          
+
+          
+            
+              <span class="post-comments-count">
+                &nbsp; | &nbsp;
+                <a href="/2018/01/11/Ubuntu 17.10 VMware Workstation 14 Pro问题/#comments" itemprop="discussionUrl">
+                  <span class="post-comments-count ds-thread-count" data-thread-key="2018/01/11/Ubuntu 17.10 VMware Workstation 14 Pro问题/" itemprop="commentsCount"></span>
+                </a>
+              </span>
+            
+          
+
+          
+
+          
+          
+
+          
+        </div>
+      </header>
+    
+
+
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        
+          
+            <p>Ubuntu 17.10 VMware Workstation 14 Pro<br>当启动一个虚拟机的时候提示</p>
+<blockquote>
+<p>Not enough physical memory is available to power on this virtual machine with its configured settings.<br>To fix this problem, increase the amount of physical memory for all virtual machines to 2130 MB or adjust the additional memory settings to allow more virtual machine memory to be swapped.<br>It is possible that native applications and/or services have locked down memory which could be preventing the virtual machine from launching. Shutting down unnecessary applications or services may free enough memory to launch this virtual machine.<br>If you were able to power on this virtual machine on this host computer in the past, try rebooting the host computer. Rebooting may allow you to use slightly more host memory to run virtual machines.</p>
+</blockquote>
+<p>当前我用的 Ubuntu 17.10 使用的内核版本4.13.x，这个内核有一些小的变化，需要对Vmware vmmon模块打补丁</p>
+<p>尝试使用下面的代码，可以解决问题<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div></pre></td><td class="code"><pre><div class="line">sudo cd /tmp</div><div class="line">cp /usr/lib/vmware/modules/source/vmmon.tar vmmon.tar</div><div class="line">tar xf vmmon.tar</div><div class="line">rm vmmon.tar</div><div class="line">wget https://raw.githubusercontent.com/mkubecek/vmware-host-modules/fadedd9c8a4dd23f74da2b448572df95666dfe12/vmmon-only/linux/hostif.c</div><div class="line">mv -f hostif.c vmmon-only/linux/hostif.c</div><div class="line">tar cf vmmon.tar vmmon-only</div><div class="line">rm -fr vmmon-only</div><div class="line">mv -f vmmon.tar /usr/lib/vmware/modules/source/vmmon.tar</div><div class="line">vmware-modconfig --console --install-all</div></pre></td></tr></table></figure></p>
+
+          
+        
+      
+    </div>
+
+    <div>
+      
+    </div>
+
+    <div>
+      
+    </div>
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </article>
+
+
+    
+      
+
+  
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+            
+            
+              
+                
                 <a class="post-title-link" href="/2018/01/03/NRC编码解码/" itemprop="url">
                   NCR 编码解码
                 </a>
@@ -1173,7 +1279,7 @@
         <nav class="site-state motion-element">
           <div class="site-state-item site-state-posts">
             <a href="/archives">
-              <span class="site-state-item-count">7</span>
+              <span class="site-state-item-count">8</span>
               <span class="site-state-item-name">日志</span>
             </a>
           </div>
@@ -1190,7 +1296,7 @@
           
             <div class="site-state-item site-state-tags">
               <a href="/tags">
-                <span class="site-state-item-count">4</span>
+                <span class="site-state-item-count">5</span>
                 <span class="site-state-item-name">标签</span>
               </a>
             </div>
