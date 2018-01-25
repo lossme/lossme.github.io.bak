@@ -273,6 +273,122 @@
             
               
                 
+                <a class="post-title-link" href="/2018/01/25/Docker安装MySQL/" itemprop="url">
+                  Docker安装MySQL并设置UTF8编码
+                </a>
+              
+            
+          </h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            <span class="post-meta-item-icon">
+              <i class="fa fa-calendar-o"></i>
+            </span>
+            <span class="post-meta-item-text">发表于</span>
+            <time itemprop="dateCreated" datetime="2018-01-25T19:18:57+08:00" content="2018-01-25">
+              2018-01-25
+            </time>
+          </span>
+
+          
+
+          
+            
+              <span class="post-comments-count">
+                &nbsp; | &nbsp;
+                <a href="/2018/01/25/Docker安装MySQL/#comments" itemprop="discussionUrl">
+                  <span class="post-comments-count ds-thread-count" data-thread-key="2018/01/25/Docker安装MySQL/" itemprop="commentsCount"></span>
+                </a>
+              </span>
+            
+          
+
+          
+
+          
+          
+
+          
+        </div>
+      </header>
+    
+
+
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        
+          
+            <p>这么理解吧</p>
+<p>docker中所说的image（镜像）相当于创建虚拟机时使用的iso文件</p>
+<p>docker中所说的container（容器）相当于你创建的虚拟机</p>
+<h2 id="创建容器"><a href="#创建容器" class="headerlink" title="创建容器"></a>创建容器</h2><figure class="highlight sh"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div></pre></td><td class="code"><pre><div class="line"><span class="comment"># 拉取镜像</span></div><div class="line">sudo docker pull mysql/mysql-server:5.7</div><div class="line"></div><div class="line"><span class="comment"># 从镜像中创建容器</span></div><div class="line">sudo docker run \</div><div class="line">    -v /数据文件保存目录:/var/lib/mysql \</div><div class="line">    -v /配置文件目录/mysqld_charset.cnf:/etc/mysql/my.cnf \</div><div class="line">    --name=mydb \</div><div class="line">    -p 3306:3306 \</div><div class="line">    <span class="_">-e</span> MYSQL_ROOT_PASSWORD=root \</div><div class="line">    <span class="_">-d</span> mysql/mysql-server:5.7</div></pre></td></tr></table></figure>
+<blockquote>
+<p>配置文件<a href="https://github.com/dnhsoft/docker-mysql-utf8" target="_blank" rel="external">mysqld_charset.cnf</a>，内容如下:<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div></pre></td><td class="code"><pre><div class="line">[mysqld]</div><div class="line">character_set_server=utf8</div><div class="line">character_set_filesystem=utf8</div><div class="line">collation-server=utf8_general_ci</div><div class="line">init-connect=&apos;SET NAMES utf8&apos;</div><div class="line">init_connect=&apos;SET collation_connection = utf8_general_ci&apos;</div><div class="line">skip-character-set-client-handshake</div></pre></td></tr></table></figure></p>
+</blockquote>
+<p><strong>注意</strong>: mysqld_charset.cnf文件权限不能过大，拥有者有读写权限即可，这里我设置为644</p>
+<p>若启动时没有设置密码，会生一个随机密码。登陆后需要重新设置<br><figure class="highlight sh"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div></pre></td><td class="code"><pre><div class="line"><span class="comment"># 查看密码</span></div><div class="line">sudo docker logs mydb</div><div class="line"></div><div class="line"><span class="comment"># 进入容器</span></div><div class="line">sudo docker <span class="built_in">exec</span> -it mydb mysql -uroot -p</div><div class="line"></div><div class="line"><span class="comment"># 修改密码</span></div><div class="line">mysql&gt; ALTER USER <span class="string">'root'</span>@<span class="string">'localhost'</span> IDENTIFIED BY <span class="string">'passwd123'</span>;</div></pre></td></tr></table></figure></p>
+<h2 id="设置root用户允许外部访问"><a href="#设置root用户允许外部访问" class="headerlink" title="设置root用户允许外部访问"></a>设置root用户允许外部访问</h2><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div></pre></td><td class="code"><pre><div class="line"># 进入容器</div><div class="line">sudo docker exec -it mydb mysql -uroot -p</div><div class="line"></div><div class="line"># 设置root用户允许外部访问</div><div class="line">mysql&gt; use mysql;</div><div class="line">mysql&gt; UPDATE user SET host = &apos;%&apos; WHERE user = &apos;root&apos;;</div></pre></td></tr></table></figure>
+<h2 id="查看字符集"><a href="#查看字符集" class="headerlink" title="查看字符集"></a>查看字符集</h2><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div></pre></td><td class="code"><pre><div class="line">mysql&gt; SHOW VARIABLES LIKE &apos;%char%&apos;;</div><div class="line">mysql&gt; SHOW VARIABLES LIKE &apos;collation_%&apos;;</div></pre></td></tr></table></figure>
+<h2 id="设置导入文件大限制"><a href="#设置导入文件大限制" class="headerlink" title="设置导入文件大限制"></a>设置导入文件大限制</h2><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">mysql&gt; SET GLOBAL max_allowed_packet=1024*1024*1024;</div></pre></td></tr></table></figure>
+<h2 id="进入容器"><a href="#进入容器" class="headerlink" title="进入容器"></a>进入容器</h2><figure class="highlight sh"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">sudo docker <span class="built_in">exec</span> -it mydb /bin/bash</div></pre></td></tr></table></figure>
+<h2 id="停止容器"><a href="#停止容器" class="headerlink" title="停止容器"></a>停止容器</h2><figure class="highlight sh"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">sudo docker stop mydb</div></pre></td></tr></table></figure>
+<h2 id="启动容器"><a href="#启动容器" class="headerlink" title="启动容器"></a>启动容器</h2><figure class="highlight sh"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">sudo docker start mydb</div></pre></td></tr></table></figure>
+<h2 id="删除容器"><a href="#删除容器" class="headerlink" title="删除容器"></a>删除容器</h2><figure class="highlight sh"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">sudo docker rm mydb</div></pre></td></tr></table></figure>
+
+          
+        
+      
+    </div>
+
+    <div>
+      
+    </div>
+
+    <div>
+      
+    </div>
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </article>
+
+
+    
+      
+
+  
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+            
+            
+              
+                
                 <a class="post-title-link" href="/2018/01/17/Chrome Flash插件已被拦截/" itemprop="url">
                   Chrome Flash插件已被拦截
                 </a>
@@ -1403,7 +1519,7 @@
         <nav class="site-state motion-element">
           <div class="site-state-item site-state-posts">
             <a href="/archives">
-              <span class="site-state-item-count">9</span>
+              <span class="site-state-item-count">10</span>
               <span class="site-state-item-name">日志</span>
             </a>
           </div>
@@ -1420,7 +1536,7 @@
           
             <div class="site-state-item site-state-tags">
               <a href="/tags">
-                <span class="site-state-item-count">5</span>
+                <span class="site-state-item-count">6</span>
                 <span class="site-state-item-name">标签</span>
               </a>
             </div>
